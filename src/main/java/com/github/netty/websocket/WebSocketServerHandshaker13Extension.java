@@ -1,7 +1,10 @@
 package com.github.netty.websocket;
 
 import com.github.netty.core.constants.HttpHeaderConstants;
-import io.netty.channel.*;
+import io.netty.channel.Channel;
+import io.netty.channel.ChannelFuture;
+import io.netty.channel.ChannelHandlerContext;
+import io.netty.channel.ChannelPipeline;
 import io.netty.handler.codec.http.*;
 import io.netty.handler.codec.http.websocketx.WebSocketServerHandshaker13;
 import io.netty.handler.codec.http.websocketx.extensions.*;
@@ -16,8 +19,8 @@ import java.util.*;
  */
 public class WebSocketServerHandshaker13Extension extends WebSocketServerHandshaker13 {
 
-    private static final String EXTENSION_SEPARATOR = ",";
-    private static final String PARAMETER_SEPARATOR = ";";
+    private static final char EXTENSION_SEPARATOR = ',';
+    private static final char PARAMETER_SEPARATOR = ';';
     private static final char PARAMETER_EQUAL = '=';
 
     private String httpDecoderContextName;
