@@ -27,7 +27,7 @@ public class WebSocketMessageToRunnable implements MessageToRunnable {
 
     private MessageToRunnable parent;
 
-    WebSocketMessageToRunnable(MessageToRunnable parent) {
+    public WebSocketMessageToRunnable(MessageToRunnable parent) {
         this.parent = parent;
     }
 
