@@ -39,13 +39,11 @@ public class WebSocketMessageToRunnable implements MessageToRunnable {
             task.frame = (WebSocketFrame) msg;
             return task;
         }
-
         if(parent != null){
             return parent.newRunnable(channelHandlerContext,msg);
         }
-        throw new IllegalStateException("不支持的类型");
+        throw new IllegalStateException("["+msg.getClass().getName()+"] 无法处理的消息数据类型");
     }
-
 
     /**
      * Websocket任务
