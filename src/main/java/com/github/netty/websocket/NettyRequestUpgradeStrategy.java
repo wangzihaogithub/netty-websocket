@@ -4,7 +4,7 @@ import com.github.netty.core.NettyHttpRequest;
 import com.github.netty.core.constants.HttpHeaderConstants;
 import com.github.netty.core.util.Wrapper;
 import com.github.netty.servlet.ServletHttpServletRequest;
-import com.github.netty.servlet.handler.NettyServletHandler;
+import com.github.netty.servlet.handler.ServletHandler;
 import com.github.netty.servlet.util.ServletUtil;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelFuture;
@@ -26,7 +26,10 @@ import javax.websocket.Endpoint;
 import javax.websocket.EndpointConfig;
 import javax.websocket.Extension;
 import java.security.Principal;
-import java.util.*;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  *
@@ -102,6 +105,7 @@ public class NettyRequestUpgradeStrategy extends AbstractStandardUpgradeStrategy
         NettyHttpRequest nettyRequest = servletRequest.getNettyRequest();
         ChannelHandlerContext channelContext = Wrapper.unwrap(servletRequest.getHttpServletObject().getChannelHandlerContext());
 
+        ServletContext servletContext = servletRequest.getServletContext();
         String queryString = servletRequest.getQueryString();
         String httpSessionId = servletRequest.getSession().getId();
         String webSocketURL = getWebSocketLocation(servletRequest);
@@ -112,7 +116,7 @@ public class NettyRequestUpgradeStrategy extends AbstractStandardUpgradeStrategy
         handshakelFuture.addListener((ChannelFutureListener) future -> {
             if(future.isSuccess()) {
                 Channel channel = future.channel();
-                NettyServletHandler.setTaskFactory(channel, new WebSocketTaskFactory(NettyServletHandler.getTaskFactory(channel)));
+                ServletHandler.setMessageToRunnable(channel, new WebSocketMessageToRunnable(ServletHandler.getMessageToRunnable(channel)));
                 WebSocketSession websocketSession = new WebSocketSession(
                         channel, webSocketContainer, wsHandshaker,
                         requestParameterMap,

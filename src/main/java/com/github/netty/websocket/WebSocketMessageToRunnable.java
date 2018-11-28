@@ -1,11 +1,9 @@
 package com.github.netty.websocket;
 
+import com.github.netty.core.MessageToRunnable;
 import com.github.netty.core.util.AbstractRecycler;
 import com.github.netty.core.util.Recyclable;
 import com.github.netty.core.util.TypeUtil;
-import com.github.netty.servlet.ServletContext;
-import com.github.netty.servlet.handler.TaskFactory;
-import com.github.netty.springboot.NettyProperties;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.http.websocketx.*;
 
@@ -18,7 +16,7 @@ import java.util.Set;
  * websocket任务工厂
  * @author 84215
  */
-public class WebSocketTaskFactory implements TaskFactory {
+public class WebSocketMessageToRunnable implements MessageToRunnable {
 
     private static final AbstractRecycler<WebsocketTask> RECYCLER = new AbstractRecycler<WebsocketTask>() {
         @Override
@@ -27,14 +25,14 @@ public class WebSocketTaskFactory implements TaskFactory {
         }
     };
 
-    private TaskFactory parent;
+    private MessageToRunnable parent;
 
-    WebSocketTaskFactory(TaskFactory parent) {
+    WebSocketMessageToRunnable(MessageToRunnable parent) {
         this.parent = parent;
     }
 
     @Override
-    public Runnable newTask(ServletContext servletContext, NettyProperties config, ChannelHandlerContext channelHandlerContext, Object o) {
+    public Runnable newRunnable(ChannelHandlerContext channelHandlerContext, Object o) {
         if(o instanceof WebSocketFrame) {
             WebsocketTask task = RECYCLER.getInstance();
             task.context = channelHandlerContext;
@@ -43,7 +41,7 @@ public class WebSocketTaskFactory implements TaskFactory {
         }
 
         if(parent != null){
-            return parent.newTask(servletContext,config,channelHandlerContext,o);
+            return parent.newRunnable(channelHandlerContext,o);
         }
         throw new IllegalStateException("不支持的类型");
     }
