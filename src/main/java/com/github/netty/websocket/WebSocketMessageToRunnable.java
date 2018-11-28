@@ -32,16 +32,16 @@ public class WebSocketMessageToRunnable implements MessageToRunnable {
     }
 
     @Override
-    public Runnable newRunnable(ChannelHandlerContext channelHandlerContext, Object o) {
-        if(o instanceof WebSocketFrame) {
+    public Runnable newRunnable(ChannelHandlerContext channelHandlerContext, Object msg) {
+        if(msg instanceof WebSocketFrame) {
             WebsocketTask task = RECYCLER.getInstance();
             task.context = channelHandlerContext;
-            task.frame = (WebSocketFrame) o;
+            task.frame = (WebSocketFrame) msg;
             return task;
         }
 
         if(parent != null){
-            return parent.newRunnable(channelHandlerContext,o);
+            return parent.newRunnable(channelHandlerContext,msg);
         }
         throw new IllegalStateException("不支持的类型");
     }
