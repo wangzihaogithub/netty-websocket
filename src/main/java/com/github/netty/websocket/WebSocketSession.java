@@ -1,5 +1,7 @@
 package com.github.netty.websocket;
 
+import com.github.netty.core.util.IOUtil;
+import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelFutureListener;
@@ -10,9 +12,11 @@ import io.netty.util.AttributeKey;
 import javax.websocket.*;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.io.OutputStreamWriter;
 import java.io.Writer;
 import java.net.URI;
 import java.nio.ByteBuffer;
+import java.nio.charset.Charset;
 import java.security.Principal;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -28,7 +32,7 @@ import java.util.concurrent.atomic.AtomicLong;
  * @author acer01
  *  2018/10/13/013
  */
-public class WebSocketSession implements Session{
+public class WebSocketSession implements Session {
 
     public static final AttributeKey<WebSocketSession> CHANNEL_ATTR_KEY_SESSION = AttributeKey.valueOf(WebSocketSession.class + "#WebSocketSession");
     private static AtomicLong ids = new AtomicLong(0);
@@ -152,7 +156,7 @@ public class WebSocketSession implements Session{
 
     @Override
     public boolean isSecure() {
-        return requestUri.getScheme().equalsIgnoreCase("wss");
+        return "wss".equalsIgnoreCase(requestUri.getScheme());
     }
 
     @Override
@@ -383,7 +387,30 @@ public class WebSocketSession implements Session{
     }
 
     class BasicRemoteEndpoint implements RemoteEndpoint.Basic{
+        class BasicRemoteOutputStream extends OutputStream{
+            @Override
+            public void write(int b) throws IOException {
+                int byteLen = 1;
+                byte[] bytes = new byte[byteLen];
+                IOUtil.setByte(bytes,0,b);
+                write(bytes,0,byteLen);
+            }
 
+            @Override
+            public void write(byte[] b, int off, int len) throws IOException {
+                ByteBuf ioByteBuf = channel.alloc().heapBuffer(len);
+                ioByteBuf.writeBytes(b, off, len);
+                channel.write(ioByteBuf);
+            }
+
+            @Override
+            public void flush() throws IOException {
+                channel.flush();
+            }
+        }
+
+        private Writer writer;
+        private OutputStream outputStream;
         private final AtomicBoolean batchingAllowed = new AtomicBoolean(false);
 
         @Override
@@ -408,12 +435,26 @@ public class WebSocketSession implements Session{
 
         @Override
         public OutputStream getSendStream() throws IOException {
-            return null;
+            if(outputStream == null){
+                synchronized (this){
+                    if(outputStream == null){
+                        outputStream = new BasicRemoteOutputStream();
+                    }
+                }
+            }
+            return outputStream;
         }
 
         @Override
         public Writer getSendWriter() throws IOException {
-            return null;
+            if(writer == null){
+                synchronized (this){
+                    if(writer == null){
+                        writer = new OutputStreamWriter(getSendStream(), Charset.forName("UTF-8"));
+                    }
+                }
+            }
+            return writer;
         }
 
         @Override

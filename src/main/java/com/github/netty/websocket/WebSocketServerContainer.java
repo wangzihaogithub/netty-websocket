@@ -5,26 +5,15 @@ import javax.websocket.server.ServerContainer;
 import javax.websocket.server.ServerEndpointConfig;
 import java.io.IOException;
 import java.net.URI;
-import java.nio.channels.AsynchronousChannelGroup;
-import java.nio.charset.StandardCharsets;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
 /**
+ * 注：只实现了服务端，客户端的功能未实现
  * @author 84215
  */
 public class WebSocketServerContainer implements WebSocketContainer,ServerContainer {
-
-    private static final byte[] CRLF = new byte[] { 13, 10 };
-
-    private static final byte[] GET_BYTES = "GET ".getBytes(StandardCharsets.ISO_8859_1);
-    private static final byte[] ROOT_URI_BYTES = "/".getBytes(StandardCharsets.ISO_8859_1);
-    private static final byte[] HTTP_VERSION_BYTES =
-            " HTTP/1.1\r\n".getBytes(StandardCharsets.ISO_8859_1);
-
-    private volatile AsynchronousChannelGroup asynchronousChannelGroup = null;
-    private final Object asynchronousChannelGroupLock = new Object();
 
     private final Map<Endpoint, Set<Session>> endpointSessionMap = new HashMap<>();
     private final Map<Session,Session> sessions = new ConcurrentHashMap<>();
@@ -34,8 +23,6 @@ public class WebSocketServerContainer implements WebSocketContainer,ServerContai
     private int maxBinaryMessageBufferSize = 8 * 1024;
     private int maxTextMessageBufferSize = 8 * 1024;
     private volatile long defaultMaxSessionIdleTimeout = 0;
-    private int backgroundProcessCount = 0;
-    private int processPeriod = 10;
     private final ConcurrentMap<String,Set<Session>> authenticatedSessions = new ConcurrentHashMap<>();
     private static final CloseReason AUTHENTICATED_HTTP_SESSION_CLOSED = new CloseReason(CloseReason.CloseCodes.VIOLATED_POLICY,
                     "This connection was established under an authenticated " +
