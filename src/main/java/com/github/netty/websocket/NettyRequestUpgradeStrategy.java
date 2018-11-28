@@ -99,7 +99,7 @@ public class NettyRequestUpgradeStrategy extends AbstractStandardUpgradeStrategy
      * @param endpointConfig
      * @param webSocketContainer
      */
-    private void handshakeToWebsocket(ServletHttpServletRequest servletRequest, String subprotocols, int maxFramePayloadLength, Principal userPrincipal,
+    protected void handshakeToWebsocket(ServletHttpServletRequest servletRequest, String subprotocols, int maxFramePayloadLength, Principal userPrincipal,
                                       List<Extension> negotiatedExtensions, Map<String, String> pathParameters,
                                       Endpoint localEndpoint, EndpointConfig endpointConfig, WebSocketServerContainer webSocketContainer){
         NettyHttpRequest nettyRequest = servletRequest.getNettyRequest();
@@ -131,7 +131,7 @@ public class NettyRequestUpgradeStrategy extends AbstractStandardUpgradeStrategy
         });
     }
 
-    private Map<String,List<String>> getRequestParameterMap(HttpServletRequest request){
+    protected Map<String,List<String>> getRequestParameterMap(HttpServletRequest request){
         MultiValueMap<String,String> requestParameterMap = new LinkedMultiValueMap<>();
         for(Map.Entry<String,String[]> entry : request.getParameterMap().entrySet()){
             for(String value : entry.getValue()){
@@ -141,7 +141,7 @@ public class NettyRequestUpgradeStrategy extends AbstractStandardUpgradeStrategy
         return requestParameterMap;
     }
 
-    private static String getWebSocketLocation(HttpServletRequest req) {
+    protected String getWebSocketLocation(HttpServletRequest req) {
         String host = req.getHeader(HttpHeaderConstants.HOST.toString());
         if(host == null || host.isEmpty()){
             host = req.getServerName();
