@@ -5,13 +5,12 @@ import javax.websocket.server.ServerContainer;
 import javax.websocket.server.ServerEndpointConfig;
 import java.io.IOException;
 import java.net.URI;
-import java.nio.channels.AsynchronousChannelGroup;
-import java.nio.charset.StandardCharsets;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
 /**
+ * 注：只实现了服务端，客户端的功能未实现
  * @author 84215
  */
 public class WebSocketServerContainer implements WebSocketContainer,ServerContainer {

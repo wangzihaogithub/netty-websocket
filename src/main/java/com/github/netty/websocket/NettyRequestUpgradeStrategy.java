@@ -105,7 +105,6 @@ public class NettyRequestUpgradeStrategy extends AbstractStandardUpgradeStrategy
         NettyHttpRequest nettyRequest = servletRequest.getNettyRequest();
         ChannelHandlerContext channelContext = Wrapper.unwrap(servletRequest.getHttpServletObject().getChannelHandlerContext());
 
-        ServletContext servletContext = servletRequest.getServletContext();
         String queryString = servletRequest.getQueryString();
         String httpSessionId = servletRequest.getSession().getId();
         String webSocketURL = getWebSocketLocation(servletRequest);
