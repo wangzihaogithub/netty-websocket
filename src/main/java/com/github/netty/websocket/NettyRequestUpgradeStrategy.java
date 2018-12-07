@@ -4,7 +4,7 @@ import com.github.netty.core.NettyHttpRequest;
 import com.github.netty.core.constants.HttpHeaderConstants;
 import com.github.netty.core.util.Wrapper;
 import com.github.netty.servlet.ServletHttpServletRequest;
-import com.github.netty.servlet.handler.ServletHandler;
+import com.github.netty.servlet.handler.ServletChannelHandler;
 import com.github.netty.servlet.util.ServletUtil;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelFuture;
@@ -115,7 +115,7 @@ public class NettyRequestUpgradeStrategy extends AbstractStandardUpgradeStrategy
         handshakelFuture.addListener((ChannelFutureListener) future -> {
             if(future.isSuccess()) {
                 Channel channel = future.channel();
-                ServletHandler.setMessageToRunnable(channel, new WebSocketMessageToRunnable(ServletHandler.getMessageToRunnable(channel)));
+                ServletChannelHandler.setMessageToRunnable(channel, new WebSocketMessageToRunnable(ServletChannelHandler.getMessageToRunnable(channel)));
                 WebSocketSession websocketSession = new WebSocketSession(
                         channel, webSocketContainer, wsHandshaker,
                         requestParameterMap,
